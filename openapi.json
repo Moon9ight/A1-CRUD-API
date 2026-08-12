@@ -1,0 +1,378 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Farmer Produce API",
+    "description": "A CRUD API for managing produce that a farmer plans to plant.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/produce": {
+      "get": {
+        "summary": "Get Produce",
+        "description": "Returns all produce items in the farmer's planting list. Supports optional filtering.",
+        "parameters": [
+          {
+            "name": "planted",
+            "in": "query",
+            "required": false,
+            "description": "Filter by planting status (true = planted, false = not planted)",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search for produce by name (case-insensitive and supports partial match)",
+            "schema": {
+              "type": "string",
+              "example": "maize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of produce items.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Produce"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a produce item",
+        "description": "Adds a new produce item to the farmer's planting list.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProduceInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Produce item created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Produce"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/produce/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "The ID of the produce item.",
+          "schema": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get one produce item",
+        "description": "Returns a single produce item by its ID.",
+        "responses": {
+          "200": {
+            "description": "Produce item found successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Produce"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produce item not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a produce item",
+        "description": "Updates one or more fields of an existing produce item.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProduceUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Produce item updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Produce"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produce item not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a produce item",
+        "description": "Removes a produce item from the farmer's planting list.",
+        "responses": {
+          "204": {
+            "description": "Produce item deleted successfully. No response body."
+          },
+          "400": {
+            "description": "Invalid ID supplied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produce item not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "summary": "Get statistics",
+        "description": "Returns counts of total produce, planted, and not planted items.",
+        "responses": {
+          "200": {
+            "description": "Statistics calculated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stats"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reset": {
+      "post": {
+        "summary": "Reset to seed data",
+        "description": "Restores the initial seed produce items. Useful for testing and demos.",
+        "responses": {
+          "200": {
+            "description": "Seed data restored successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Produce"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProduceInput": {
+        "type": "object",
+        "required": ["name", "quantity"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Pepper"
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 4
+          },
+          "unit": {
+            "type": "string",
+            "example": "beds"
+          },
+          "season": {
+            "type": "string",
+            "example": "Rainy"
+          }
+        }
+      },
+      "ProduceUpdateInput": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Bell Pepper"
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 6
+          },
+          "unit": {
+            "type": "string",
+            "example": "rows"
+          },
+          "season": {
+            "type": "string",
+            "example": "Dry"
+          },
+          "planted": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "Produce": {
+        "type": "object",
+        "required": ["id", "name", "quantity", "planted"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Maize"
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 5
+          },
+          "unit": {
+            "type": "string",
+            "example": "bags"
+          },
+          "season": {
+            "type": "string",
+            "example": "Rainy"
+          },
+          "planted": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "Stats": {
+        "type": "object",
+        "required": ["total", "planted", "notPlanted"],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "example": 5
+          },
+          "planted": {
+            "type": "integer",
+            "example": 2
+          },
+          "notPlanted": {
+            "type": "integer",
+            "example": 3
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "name is required and cannot be empty"
+          }
+        }
+      }
+    }
+  }
+}
